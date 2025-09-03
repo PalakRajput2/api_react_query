@@ -42,7 +42,7 @@ export const useComments = () => {
     },
   });
 
-  //  Update comment
+  // Update comment
   const updateMutation = useMutation({
     mutationFn: updateComment,
     onMutate: async (updatedComment) => {
