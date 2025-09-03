@@ -13,7 +13,7 @@ export default function BlogPage() {
   const [editing, setEditing] = useState(null);
   const [confirm, setConfirm] = useState({ open: false, id: null });
   const [alert, setAlert] = useState({ type: "success", message: "" });
-  const [lastEditedId, setLastEditedId] = useState(null); 
+  const [highlightedId, setHighlightedId] = useState(null);
 
   const formRef = useRef(null);
 
@@ -29,19 +29,19 @@ export default function BlogPage() {
         {
           onSuccess: (updatedComment) => {
             showAlert("success", "Comment updated");
-            setLastEditedId(updatedComment.id); // ✅ highlight after update
+            setHighlightedId(updatedComment.id);
+            setEditing(null);
           },
-          onError: () => showAlert("error", "Failed to update"),
+          onError: () => showAlert("error", "Failed to update comment"),
         }
       );
-      setEditing(null);
     } else {
       addMutation.mutate(data, {
         onSuccess: (newComment) => {
           showAlert("success", "Comment added");
-          setLastEditedId(newComment.id); // ✅ highlight new comment too
+          setHighlightedId(newComment.id);
         },
-        onError: () => showAlert("error", "Failed to add"),
+        onError: () => showAlert("error", "Failed to add comment"),
       });
     }
   };
@@ -58,7 +58,7 @@ export default function BlogPage() {
     setConfirm({ open: false, id: null });
     deleteMutation.mutate(id, {
       onSuccess: () => showAlert("success", "Comment deleted"),
-      onError: () => showAlert("error", "Failed to delete"),
+      onError: () => showAlert("error", "Failed to delete comment"),
     });
   };
 
@@ -78,12 +78,11 @@ export default function BlogPage() {
 
       <CommentForm onSubmit={handleAdd} initialData={editing} />
 
-      {/* ✅ use CommentList here */}
       <CommentList
         comments={comments}
         onEdit={handleEdit}
         onDelete={requestDelete}
-        lastEditedId={lastEditedId}
+        highlightedId={highlightedId}
       />
 
       <ConfirmDialog

@@ -1,29 +1,43 @@
 import { useRef, useEffect } from "react";
 import CommentCard from "./CommentCard";
 
-export default function CommentList({ comments, onEdit, onDelete, lastEditedId }) {
+export default function CommentList({ comments, onEdit, onDelete, highlightedId }) {
   const cardRefs = useRef({});
 
   useEffect(() => {
-    if (lastEditedId && cardRefs.current[lastEditedId]) {
-      cardRefs.current[lastEditedId].scrollIntoView({
+    if (highlightedId && cardRefs.current[highlightedId]) {
+      const el = cardRefs.current[highlightedId];
+      
+      // Scroll to element
+      el.scrollIntoView({
         behavior: "smooth",
         block: "center",
       });
 
-      // highlight effect
-      const el = cardRefs.current[lastEditedId];
-      el.classList.add("bg-yellow-100");
-      setTimeout(() => el.classList.remove("bg-yellow-100"), 1500);
+      // Add highlight effect
+      el.classList.add("bg-yellow-100", "transition-colors", "duration-500");
+      
+      // Remove highlight after delay
+      setTimeout(() => {
+        if (el && el.classList.contains("bg-yellow-100")) {
+          el.classList.remove("bg-yellow-100");
+        }
+      }, 2000);
     }
-  }, [lastEditedId]);
+  }, [highlightedId]);
+
+  // Filter out any temporary or duplicate comments
+  const uniqueComments = comments.filter((comment, index, self) =>
+    index === self.findIndex((c) => c.id === comment.id)
+  );
 
   return (
     <div className="space-y-3">
-      {comments?.map((comment) => (
+      {uniqueComments.map((comment) => (
         <div
           key={comment.id}
           ref={(el) => (cardRefs.current[comment.id] = el)}
+          className="transition-all duration-300"
         >
           <CommentCard
             comment={comment}
