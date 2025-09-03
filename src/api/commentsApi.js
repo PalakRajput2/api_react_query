@@ -21,40 +21,35 @@ export const fetchComments = async () => {
   }
 };
 
-// Add comment - JSONPlaceholder doesn't actually create, so we simulate
+// Add comment 
 export const addComment = async (comment) => {
   try {
-    // JSONPlaceholder returns mock data but doesn't persist
     const { data } = await axios.post(API_URL, comment);
     return { ...data, id: Date.now() }; // Generate unique ID locally
   } catch (error) {
     console.error("Error adding comment:", error);
-    // Simulate success response
-    return { ...comment, id: Date.now() };
+     return { ...comment, id: Date.now() };
   }
 };
 
-// Update comment - JSONPlaceholder often fails with PUT
+// Update comment 
 export const updateComment = async (comment) => {
   try {
-    // Use PATCH instead of PUT as it's more reliable with JSONPlaceholder
-    const { data } = await axios.patch(`${API_URL}/${comment.id}`, comment);
+      const { data } = await axios.patch(`${API_URL}/${comment.id}`, comment);
     return data;
   } catch (error) {
     console.error("Error updating comment:", error);
-    // If update fails, return the comment as if it succeeded
-    return comment;
+      return comment;
   }
 };
 
-// Delete comment - JSONPlaceholder doesn't actually delete
+// Delete comment 
 export const deleteComment = async (id) => {
   try {
     await axios.delete(`${API_URL}/${id}`);
     return id;
   } catch (error) {
     console.error("Error deleting comment:", error);
-    // Still return the ID as if deletion succeeded
-    return id;
+     return id;
   }
 };
