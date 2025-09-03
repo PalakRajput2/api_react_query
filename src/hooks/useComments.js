@@ -44,27 +44,27 @@ export const useComments = () => {
 
   // Update comment
   const updateMutation = useMutation({
-    mutationFn: updateComment,
-    onMutate: async (updatedComment) => {
-      await queryClient.cancelQueries(["comments"]);
-      const prevComments = queryClient.getQueryData(["comments"]);
+  mutationFn: updateComment,
+  onMutate: async (updatedComment) => {
+    await queryClient.cancelQueries(["comments"]);
+    const prevComments = queryClient.getQueryData(["comments"]);
 
-      queryClient.setQueryData(["comments"], (old = []) =>
-        old.map((c) => (c.id === updatedComment.id ? updatedComment : c))
-      );
+    queryClient.setQueryData(["comments"], (old = []) =>
+      old.map((c) => (c.id === updatedComment.id ? updatedComment : c))
+    );
 
-      return { prevComments };
-    },
-    onError: (_err, _newComment, context) => {
-      queryClient.setQueryData(["comments"], context.prevComments);
-    },
-    onSuccess: (savedComment) => {
-      queryClient.setQueryData(["comments"], (old = []) =>
-        old.map((c) => (c.id === savedComment.id ? savedComment : c))
-      );
-    },
-  });
-
+    // ✅ Optimistically return the updated comment
+    return { prevComments, updatedComment };
+  },
+  onError: (_err, _newComment, context) => {
+    queryClient.setQueryData(["comments"], context.prevComments);
+  },
+  onSuccess: (savedComment) => {
+    queryClient.setQueryData(["comments"], (old = []) =>
+      old.map((c) => (c.id === savedComment.id ? savedComment : c))
+    );
+  },
+});
   // Delete comment
   const deleteMutation = useMutation({
     mutationFn: deleteComment,
